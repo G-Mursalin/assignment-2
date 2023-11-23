@@ -1,10 +1,10 @@
 import { Schema, model } from 'mongoose';
 import bcrypt from 'bcrypt';
 import validator from 'validator';
-import { TUser } from './user.interface';
+import { TUser, UserModelWithStaticMethod } from './user.interface';
 import config from '../../config';
 
-const userSchema = new Schema<TUser>({
+const userSchema = new Schema<TUser, UserModelWithStaticMethod>({
   userId: {
     type: Number,
     unique: true,
@@ -72,7 +72,11 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
+userSchema.statics.isUserExists = async function (id: string) {
+  return await UserModel.findOne({ userId: id });
+};
+
 // User Model
-const UserModel = model<TUser>('User', userSchema);
+const UserModel = model<TUser, UserModelWithStaticMethod>('User', userSchema);
 
 export default UserModel;

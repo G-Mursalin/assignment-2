@@ -1,6 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Request, Response } from 'express';
 import UserSchema from './user.validation';
 import { userServices } from './user.service';
+import UserModel from './user.model';
 
 const createNewUser = async (req: Request, res: Response) => {
   try {
@@ -11,6 +13,7 @@ const createNewUser = async (req: Request, res: Response) => {
 
     const result = await userServices.createNewUser(validateData);
     result.password = undefined;
+    result.__v = undefined;
 
     res.status(201).json({
       success: true,
@@ -18,10 +21,19 @@ const createNewUser = async (req: Request, res: Response) => {
       data: result,
     });
   } catch (error: any) {
-    res.status(500).json({
-      status: 'fail',
-      message: error.message || 'Something went wrong',
-    });
+    if (error.name === 'ZodError') {
+      res.status(500).json({
+        status: 'fail',
+        message: error.issues
+          .map((error: any) => `${error.path.join('.')}: ${error.message}`)
+          .join(', '),
+      });
+    } else {
+      res.status(500).json({
+        status: 'faildfdfdfdf',
+        message: error || 'Something went wrong',
+      });
+    }
   }
 };
 const retrieveAllUsers = async (req: Request, res: Response) => {
@@ -45,19 +57,23 @@ const retrieveSpecificUserByID = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
     // Check is user exists if not then send response
-    // res.status(500).json({
-    //     success: false,
-    //     message: 'User not found',
-    //     error: {
-    //       code: 404,
-    //       description: 'User not found!',
-    //     },
-    //   });
+    if (!(await UserModel.isUserExists(userId))) {
+      return res.status(500).json({
+        success: false,
+        message: 'User not found',
+        error: {
+          code: 404,
+          description: 'User not found!',
+        },
+      });
+    }
+
+    const result = await userServices.retrieveSpecificUserByID(userId);
 
     res.status(200).json({
       success: true,
       message: 'User fetched successfully!',
-      data: { userId },
+      data: result,
     });
   } catch (error: any) {
     res.status(500).json({
@@ -73,19 +89,25 @@ const updateUserInformation = async (req: Request, res: Response) => {
     const updatedDoc = req.body;
 
     // Check is user exists if not then send response
-    // res.status(500).json({
-    //     success: false,
-    //     message: 'User not found',
-    //     error: {
-    //       code: 404,
-    //       description: 'User not found!',
-    //     },
-    //   });
+    if (!(await UserModel.isUserExists(userId))) {
+      return res.status(500).json({
+        success: false,
+        message: 'User not found',
+        error: {
+          code: 404,
+          description: 'User not found!',
+        },
+      });
+    }
+
+    const result = await userServices.updateUserInformation(userId, updatedDoc);
+    result.password = undefined;
+    result.__v = undefined;
 
     res.status(200).json({
       success: true,
       message: 'User updated successfully!',
-      data: { userId, updatedDoc },
+      data: result,
     });
   } catch (error: any) {
     res.status(500).json({
@@ -100,14 +122,18 @@ const deleteAUser = async (req: Request, res: Response) => {
     const { userId } = req.params;
 
     // Check is user exists if not then send response
-    // res.status(500).json({
-    //     success: false,
-    //     message: 'User not found',
-    //     error: {
-    //       code: 404,
-    //       description: 'User not found!',
-    //     },
-    //   });
+    if (!(await UserModel.isUserExists(userId))) {
+      return res.status(500).json({
+        success: false,
+        message: 'User not found',
+        error: {
+          code: 404,
+          description: 'User not found!',
+        },
+      });
+    }
+
+    await userServices.deleteAUser(userId);
 
     res.status(200).json({
       success: true,
