@@ -9,13 +9,13 @@ const order = new Schema<TOrder>({
 
 const orderSchema = new Schema<TOrders, OrderModelWithStaticMethod>({
   userId: {
-    type: String,
+    type: Number,
     ref: 'User',
   },
   orders: [order],
 });
 
-orderSchema.statics.isThisUserOrderExists = async function (id: string) {
+orderSchema.statics.isThisUserOrderExists = async function (id: number) {
   return await OrderModel.findOne({ userId: id });
 };
 

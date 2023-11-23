@@ -6,5 +6,5 @@ export type TOrders = z.infer<typeof OrderSchema>;
 export type TOrder = z.infer<typeof Order>;
 
 export interface OrderModelWithStaticMethod extends Model<TOrders> {
-  isThisUserOrderExists(id: string): Promise<TOrders | null>;
+  isThisUserOrderExists(id: number): Promise<TOrders | null>;
 }

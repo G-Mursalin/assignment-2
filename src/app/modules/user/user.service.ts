@@ -11,18 +11,18 @@ const retrieveAllUsers = async (): Promise<TUser[]> => {
   );
 };
 
-const retrieveSpecificUserByID = async (id: string) => {
+const retrieveSpecificUserByID = async (id: number) => {
   return await UserModel.findOne({ userId: id }).select('-password -__v -_id');
 };
 
-const updateUserInformation = async (id: string, updatedDoc: TUser) => {
+const updateUserInformation = async (id: number, updatedDoc: TUser) => {
   return await UserModel.findOneAndUpdate({ userId: id }, updatedDoc, {
     new: true,
     runValidators: true,
   });
 };
 
-const deleteAUser = async (id: string): Promise<TUser | null> => {
+const deleteAUser = async (id: number): Promise<TUser | null> => {
   return await UserModel.findOneAndDelete({ userId: id });
 };
 

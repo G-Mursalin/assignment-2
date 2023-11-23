@@ -6,6 +6,11 @@ const router = express.Router();
 
 // Order Routes
 router.post('/:userId/orders', orderControllers.addOrders);
+router.get('/:userId/orders', orderControllers.retrieveAllOrders);
+router.get(
+  '/:userId/orders/total-price',
+  orderControllers.calculateTotalPriceOrder,
+);
 
 // Users Routes
 router

@@ -57,7 +57,7 @@ const retrieveSpecificUserByID = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
     // Check is user exists if not then send response
-    if (!(await UserModel.isUserExists(userId))) {
+    if (!(await UserModel.isUserExists(Number(userId)))) {
       return res.status(500).json({
         success: false,
         message: 'User not found',
@@ -68,7 +68,7 @@ const retrieveSpecificUserByID = async (req: Request, res: Response) => {
       });
     }
 
-    const result = await userServices.retrieveSpecificUserByID(userId);
+    const result = await userServices.retrieveSpecificUserByID(Number(userId));
 
     res.status(200).json({
       success: true,
@@ -89,7 +89,7 @@ const updateUserInformation = async (req: Request, res: Response) => {
     const updatedDoc = req.body;
 
     // Check is user exists if not then send response
-    if (!(await UserModel.isUserExists(userId))) {
+    if (!(await UserModel.isUserExists(Number(userId)))) {
       return res.status(500).json({
         success: false,
         message: 'User not found',
@@ -100,7 +100,10 @@ const updateUserInformation = async (req: Request, res: Response) => {
       });
     }
 
-    const result = await userServices.updateUserInformation(userId, updatedDoc);
+    const result = await userServices.updateUserInformation(
+      Number(userId),
+      updatedDoc,
+    );
     result.password = undefined;
     result.__v = undefined;
 
@@ -122,7 +125,7 @@ const deleteAUser = async (req: Request, res: Response) => {
     const { userId } = req.params;
 
     // Check is user exists if not then send response
-    if (!(await UserModel.isUserExists(userId))) {
+    if (!(await UserModel.isUserExists(Number(userId)))) {
       return res.status(500).json({
         success: false,
         message: 'User not found',
@@ -133,7 +136,7 @@ const deleteAUser = async (req: Request, res: Response) => {
       });
     }
 
-    await userServices.deleteAUser(userId);
+    await userServices.deleteAUser(Number(userId));
 
     res.status(200).json({
       success: true,

@@ -7,7 +7,7 @@ export const Order = z.object({
 });
 
 const OrderSchema = z.object({
-  userId: z.string(),
+  userId: z.number(),
   orders: z.array(Order),
 });
 

@@ -72,7 +72,7 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
-userSchema.statics.isUserExists = async function (id: string) {
+userSchema.statics.isUserExists = async function (id: number) {
   return await UserModel.findOne({ userId: id });
 };
 

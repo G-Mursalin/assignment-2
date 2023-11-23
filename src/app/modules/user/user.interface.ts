@@ -5,5 +5,5 @@ import { Model } from 'mongoose';
 export type TUser = z.infer<typeof UserSchema>;
 
 export interface UserModelWithStaticMethod extends Model<TUser> {
-  isUserExists(id: string): Promise<TUser | null>;
+  isUserExists(id: number): Promise<TUser | null>;
 }
