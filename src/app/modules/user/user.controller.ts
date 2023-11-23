@@ -1,11 +1,21 @@
 import { Request, Response } from 'express';
+import UserSchema from './user.validation';
+import { userServices } from './user.service';
 
 const createNewUser = async (req: Request, res: Response) => {
   try {
+    const user = req.body;
+
+    // Validation data with Zod
+    const validateData = UserSchema.parse(user);
+
+    const result = await userServices.createNewUser(validateData);
+    result.password = undefined;
+
     res.status(201).json({
       success: true,
       message: 'User created successfully!',
-      data: 'data',
+      data: result,
     });
   } catch (error: any) {
     res.status(500).json({
@@ -16,10 +26,12 @@ const createNewUser = async (req: Request, res: Response) => {
 };
 const retrieveAllUsers = async (req: Request, res: Response) => {
   try {
+    const results = await userServices.retrieveAllUsers();
+
     res.status(200).json({
       success: true,
       message: 'Users fetched successfully!',
-      data: '[{data}]',
+      data: results,
     });
   } catch (error: any) {
     res.status(500).json({

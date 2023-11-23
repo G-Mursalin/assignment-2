@@ -6,7 +6,9 @@ const createNewUser = async (user: TUser): Promise<TUser> => {
 };
 
 const retrieveAllUsers = async (): Promise<TUser[]> => {
-  return await UserModel.find();
+  return await UserModel.find().select(
+    'username fullName age email address -_id',
+  );
 };
 
 const retrieveSpecificUserByID = async (id: string): Promise<TUser | null> => {

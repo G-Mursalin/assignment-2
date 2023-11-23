@@ -1,6 +1,8 @@
 import { Schema, model } from 'mongoose';
+import bcrypt from 'bcrypt';
 import validator from 'validator';
 import { TUser } from './user.interface';
+import config from '../../config';
 
 const userSchema = new Schema<TUser>({
   userId: {
@@ -63,6 +65,14 @@ const userSchema = new Schema<TUser>({
   },
 });
 
+// Middleware for hash the incoming password
+userSchema.pre('save', async function (next) {
+  this.password = await bcrypt.hash(this.password, Number(config.bcrypt_salt));
+
+  next();
+});
+
+// User Model
 const UserModel = model<TUser>('User', userSchema);
 
 export default UserModel;
