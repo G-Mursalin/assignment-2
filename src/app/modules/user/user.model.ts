@@ -12,8 +12,9 @@ const userSchema = new Schema<TUser, UserModelWithStaticMethod>({
   },
   username: {
     type: String,
+    unique: true,
     trim: true,
-    required: [true, 'Please us your user name'],
+    required: [true, 'Please give us your user name'],
   },
   password: {
     type: String,

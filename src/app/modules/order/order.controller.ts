@@ -24,7 +24,7 @@ const addOrders = async (req: Request, res: Response) => {
     //Check if the 'orders' property already exists for this user, append a new product to it orders
     const existsOrder = await OrderModel.isThisUserOrderExists(Number(userId));
     if (existsOrder && existsOrder.orders.length >= 1) {
-      const result = await OrderModel.updateOne(
+      await OrderModel.updateOne(
         { userId: userId },
         { $addToSet: { orders: order } },
       );
@@ -35,7 +35,7 @@ const addOrders = async (req: Request, res: Response) => {
         orders: [order],
       });
 
-      const result = await orderServices.addOrders(validateData);
+      await orderServices.addOrders(validateData);
     }
 
     res.status(201).json({
@@ -53,8 +53,8 @@ const addOrders = async (req: Request, res: Response) => {
       });
     } else {
       res.status(500).json({
-        status: 'faildfdfdfdf',
-        message: error || 'Something went wrong',
+        status: 'fail',
+        message: error.message || 'Something went wrong',
       });
     }
   }
@@ -84,10 +84,17 @@ const retrieveAllOrders = async (req: Request, res: Response) => {
       data: { orders: result?.orders },
     });
   } catch (error: any) {
-    res.status(500).json({
-      status: 'fail',
-      message: error.message || 'Something went wrong',
-    });
+    if (error.name === 'CastError') {
+      res.status(500).json({
+        status: 'fail',
+        message: `Please provide a valid ${error.path}`,
+      });
+    } else {
+      res.status(500).json({
+        status: 'fail',
+        message: error.message || 'Something went wrong',
+      });
+    }
   }
 };
 
@@ -117,10 +124,17 @@ const calculateTotalPriceOrder = async (req: Request, res: Response) => {
       },
     });
   } catch (error: any) {
-    res.status(500).json({
-      status: 'fail',
-      message: error || 'Something went wrong',
-    });
+    if (error.name === 'CastError') {
+      res.status(500).json({
+        status: 'fail',
+        message: `Please provide a valid ${error.path}`,
+      });
+    } else {
+      res.status(500).json({
+        status: 'fail',
+        message: error.message || 'Something went wrong',
+      });
+    }
   }
 };
 

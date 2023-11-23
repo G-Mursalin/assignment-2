@@ -11,14 +11,14 @@ const createNewUser = async (req: Request, res: Response) => {
     // Validation data with Zod
     const validateData = UserSchema.parse(user);
 
+    // save the validate user data and fetch fresh that data
     const result = await userServices.createNewUser(validateData);
-    result.password = undefined;
-    result.__v = undefined;
+    const userData = await userServices.retrieveSpecificUserByID(result.userId);
 
     res.status(201).json({
       success: true,
       message: 'User created successfully!',
-      data: result,
+      data: userData,
     });
   } catch (error: any) {
     if (error.name === 'ZodError') {
@@ -28,14 +28,23 @@ const createNewUser = async (req: Request, res: Response) => {
           .map((error: any) => `${error.path.join('.')}: ${error.message}`)
           .join(', '),
       });
+    } else if (error.code === 11000) {
+      const { keyValue } = error;
+      res.status(500).json({
+        status: 'fail',
+        message: `${Object.keys(keyValue)[0]}: ${
+          keyValue[Object.keys(keyValue)[0]]
+        } is already exist in database. Please provide a unique value`,
+      });
     } else {
       res.status(500).json({
-        status: 'faildfdfdfdf',
+        status: 'fail',
         message: error || 'Something went wrong',
       });
     }
   }
 };
+
 const retrieveAllUsers = async (req: Request, res: Response) => {
   try {
     const results = await userServices.retrieveAllUsers();
@@ -76,10 +85,17 @@ const retrieveSpecificUserByID = async (req: Request, res: Response) => {
       data: result,
     });
   } catch (error: any) {
-    res.status(500).json({
-      status: 'fail',
-      message: error.message || 'Something went wrong',
-    });
+    if (error.name === 'CastError') {
+      res.status(500).json({
+        status: 'fail',
+        message: `Please provide a valid ${error.path}`,
+      });
+    } else {
+      res.status(500).json({
+        status: 'fail',
+        message: error.message || 'Something went wrong',
+      });
+    }
   }
 };
 
@@ -104,8 +120,6 @@ const updateUserInformation = async (req: Request, res: Response) => {
       Number(userId),
       updatedDoc,
     );
-    result.password = undefined;
-    result.__v = undefined;
 
     res.status(200).json({
       success: true,
@@ -113,10 +127,17 @@ const updateUserInformation = async (req: Request, res: Response) => {
       data: result,
     });
   } catch (error: any) {
-    res.status(500).json({
-      status: 'fail',
-      message: error.message || 'Something went wrong',
-    });
+    if (error.name === 'CastError') {
+      res.status(500).json({
+        status: 'fail',
+        message: `Please provide a valid ${error.path}`,
+      });
+    } else {
+      res.status(500).json({
+        status: 'fail',
+        message: error.message || 'Something went wrong',
+      });
+    }
   }
 };
 
@@ -144,10 +165,17 @@ const deleteAUser = async (req: Request, res: Response) => {
       data: null,
     });
   } catch (error: any) {
-    res.status(500).json({
-      status: 'fail',
-      message: error.message || 'Something went wrong',
-    });
+    if (error.name === 'CastError') {
+      res.status(500).json({
+        status: 'fail',
+        message: `Please provide a valid ${error.path}`,
+      });
+    } else {
+      res.status(500).json({
+        status: 'fail',
+        message: error.message || 'Something went wrong',
+      });
+    }
   }
 };
 

@@ -5,8 +5,12 @@ const addOrders = async (orders: TOrders): Promise<TOrders> => {
   return await OrderModel.create(orders);
 };
 
-const retrieveAllOrders = async (id: number): Promise<TOrders | null> => {
-  return await OrderModel.findOne({ userId: id });
+const retrieveAllOrders = async (id: number) => {
+  return await OrderModel.findOne({ userId: id }).select({
+    _id: 0,
+    'orders._id': 0,
+    __v: 0,
+  });
 };
 
 const calculateTotalPriceOrder = async (id: number) => {
