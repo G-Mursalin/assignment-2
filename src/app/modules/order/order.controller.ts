@@ -82,7 +82,7 @@ const retrieveAllOrders = async (req: Request, res: Response) => {
 
     // Check is this user exist in our user collection
     if (!(await UserModel.isUserExists(Number(userId)))) {
-      return errorResponse(res, 4004, 'User not found');
+      return errorResponse(res, 404, 'User not found');
     }
 
     const result = await orderServices.retrieveAllOrders(Number(userId));
