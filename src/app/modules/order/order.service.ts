@@ -20,7 +20,14 @@ const calculateTotalPriceOrder = async (id: number) => {
   return await OrderModel.aggregate([
     { $match: { userId: id } },
     { $unwind: { path: '$orders' } },
-    { $group: { _id: '$userId', totalPrice: { $sum: '$orders.price' } } },
+    {
+      $group: {
+        _id: '$userId',
+        totalPrice: {
+          $sum: { $multiply: ['$orders.price', '$orders.quantity'] },
+        },
+      },
+    },
   ]);
 };
 
