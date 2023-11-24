@@ -114,6 +114,19 @@ const updateUserInformation = async (req: Request, res: Response) => {
     const { userId } = req.params;
     const updatedDoc = req.body;
 
+    // Validation data with Zod
+    const pickFields = Object.keys(updatedDoc)
+      .filter((key) => typeof key === 'string')
+      .reduce(
+        (acc, key) => {
+          acc[key] = true;
+          return acc;
+        },
+        {} as { [key: string]: true },
+      );
+
+    UserSchema.pick(pickFields).parse(updatedDoc);
+
     // Check is user exists if not then send response
     if (!(await UserModel.isUserExists(Number(userId)))) {
       return errorResponse(res, 404, 'User not found');
@@ -131,10 +144,21 @@ const updateUserInformation = async (req: Request, res: Response) => {
       data: result,
     });
   } catch (error: any) {
-    if (error.name === 'CastError') {
+    // Handle Zod error messages
+    if (error.name === 'ZodError') {
+      const errorMessage = error.issues
+        .map((error: any) => `${error.path.join('.')}: ${error.message}`)
+        .join(', ');
+
+      errorResponse(res, 400, errorMessage);
+    }
+    // Handle Mongoose errors
+    else if (error.name === 'CastError') {
       const errorMessage = `Please provide a valid ${error.path}`;
       errorResponse(res, 400, errorMessage);
-    } else {
+    }
+    // Handle other errors
+    else {
       errorResponse(res, 400, error.message || 'Something went wrong');
     }
   }
