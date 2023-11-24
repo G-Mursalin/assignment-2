@@ -55,6 +55,13 @@ const addOrders = async (req: Request, res: Response) => {
           .join(', '),
       });
     }
+    // Handle Mongoose error messages
+    else if (error.name === 'CastError') {
+      res.status(400).json({
+        status: 'fail',
+        message: `Please provide a valid ${error.path}`,
+      });
+    }
     // Handle other errors
     else {
       res.status(400).json({
