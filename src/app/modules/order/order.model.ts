@@ -15,6 +15,7 @@ const orderSchema = new Schema<TOrders, OrderModelWithStaticMethod>({
   orders: [order],
 });
 
+// Static method for Order Model
 orderSchema.statics.isThisUserOrderExists = async function (id: number) {
   return await OrderModel.findOne({ userId: id });
 };

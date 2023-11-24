@@ -1,10 +1,12 @@
 import { TOrders } from './order.interface';
 import OrderModel from './order.model';
 
+// Services for add orders
 const addOrders = async (orders: TOrders): Promise<TOrders> => {
   return await OrderModel.create(orders);
 };
 
+// Services for get all orders
 const retrieveAllOrders = async (id: number) => {
   return await OrderModel.findOne({ userId: id }).select({
     _id: 0,
@@ -13,6 +15,7 @@ const retrieveAllOrders = async (id: number) => {
   });
 };
 
+// Services for calculate total price
 const calculateTotalPriceOrder = async (id: number) => {
   return await OrderModel.aggregate([
     { $match: { userId: id } },

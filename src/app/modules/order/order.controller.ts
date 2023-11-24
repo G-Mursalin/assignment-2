@@ -5,13 +5,14 @@ import { orderServices } from './order.service';
 import OrderModel from './order.model';
 import UserModel from '../user/user.model';
 
+// Add orders
 const addOrders = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
     const order = req.body;
     // Check is this user exist in our user collection
     if (!(await UserModel.isUserExists(Number(userId)))) {
-      return res.status(500).json({
+      return res.status(400).json({
         success: false,
         message: 'User not found',
         error: {
@@ -38,21 +39,25 @@ const addOrders = async (req: Request, res: Response) => {
       await orderServices.addOrders(validateData);
     }
 
+    // Send response
     res.status(201).json({
       success: true,
       message: 'Order created successfully!',
       data: null,
     });
   } catch (error: any) {
+    // Handle Zod Errors
     if (error.name === 'ZodError') {
-      res.status(500).json({
+      res.status(400).json({
         status: 'fail',
         message: error.issues
           .map((error: any) => `${error.path.join('.')}: ${error.message}`)
           .join(', '),
       });
-    } else {
-      res.status(500).json({
+    }
+    // Handle other errors
+    else {
+      res.status(400).json({
         status: 'fail',
         message: error.message || 'Something went wrong',
       });
@@ -60,13 +65,14 @@ const addOrders = async (req: Request, res: Response) => {
   }
 };
 
+// Get all orders for single user
 const retrieveAllOrders = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
 
     // Check is this user exist in our user collection
     if (!(await UserModel.isUserExists(Number(userId)))) {
-      return res.status(500).json({
+      return res.status(400).json({
         success: false,
         message: 'User not found',
         error: {
@@ -78,19 +84,23 @@ const retrieveAllOrders = async (req: Request, res: Response) => {
 
     const result = await orderServices.retrieveAllOrders(Number(userId));
 
+    // Send Response
     res.status(200).json({
       success: true,
       message: 'Order fetched successfully!',
       data: { orders: result?.orders },
     });
   } catch (error: any) {
+    // Handle mongoose Errors
     if (error.name === 'CastError') {
-      res.status(500).json({
+      res.status(400).json({
         status: 'fail',
         message: `Please provide a valid ${error.path}`,
       });
-    } else {
-      res.status(500).json({
+    }
+    // Handle Others errors
+    else {
+      res.status(400).json({
         status: 'fail',
         message: error.message || 'Something went wrong',
       });
@@ -98,13 +108,14 @@ const retrieveAllOrders = async (req: Request, res: Response) => {
   }
 };
 
+// Calculate total price for single user
 const calculateTotalPriceOrder = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
 
     // Check is this user exist in user collection
     if (!(await UserModel.isUserExists(Number(userId)))) {
-      return res.status(500).json({
+      return res.status(400).json({
         success: false,
         message: 'User not found',
         error: {
@@ -116,6 +127,7 @@ const calculateTotalPriceOrder = async (req: Request, res: Response) => {
 
     const result = await orderServices.calculateTotalPriceOrder(Number(userId));
 
+    // Send response
     res.status(200).json({
       success: true,
       message: 'Total price calculated successfully!',
@@ -124,13 +136,16 @@ const calculateTotalPriceOrder = async (req: Request, res: Response) => {
       },
     });
   } catch (error: any) {
+    // Handle Mongoose errors
     if (error.name === 'CastError') {
-      res.status(500).json({
+      res.status(400).json({
         status: 'fail',
         message: `Please provide a valid ${error.path}`,
       });
-    } else {
-      res.status(500).json({
+    }
+    // Handle other errors
+    else {
+      res.status(400).json({
         status: 'fail',
         message: error.message || 'Something went wrong',
       });

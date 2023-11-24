@@ -73,6 +73,7 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
+// Creating static method for user model
 userSchema.statics.isUserExists = async function (id: number) {
   return await UserModel.findOne({ userId: id });
 };
