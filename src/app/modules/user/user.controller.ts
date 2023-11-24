@@ -14,7 +14,7 @@ const errorResponse = (
     success: false,
     message: errorMessage,
     error: {
-      code: 400,
+      code: statusCode,
       description: errorMessage,
     },
   });
@@ -84,7 +84,7 @@ const retrieveSpecificUserByID = async (req: Request, res: Response) => {
     const { userId } = req.params;
     // Check is user exists if not then send response
     if (!(await UserModel.isUserExists(Number(userId)))) {
-      return errorResponse(res, 400, 'User not found');
+      return errorResponse(res, 404, 'User not found');
     }
 
     const result = await userServices.retrieveSpecificUserByID(Number(userId));
@@ -116,7 +116,7 @@ const updateUserInformation = async (req: Request, res: Response) => {
 
     // Check is user exists if not then send response
     if (!(await UserModel.isUserExists(Number(userId)))) {
-      return errorResponse(res, 400, 'User not found');
+      return errorResponse(res, 404, 'User not found');
     }
 
     const result = await userServices.updateUserInformation(
@@ -147,7 +147,7 @@ const deleteAUser = async (req: Request, res: Response) => {
 
     // Check is user exists if not then send response
     if (!(await UserModel.isUserExists(Number(userId)))) {
-      return errorResponse(res, 400, 'User not found');
+      return errorResponse(res, 404, 'User not found');
     }
 
     await userServices.deleteAUser(Number(userId));

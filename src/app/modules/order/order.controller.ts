@@ -15,7 +15,7 @@ const errorResponse = (
     success: false,
     message: errorMessage,
     error: {
-      code: 400,
+      code: statusCode,
       description: errorMessage,
     },
   });
@@ -28,7 +28,7 @@ const addOrders = async (req: Request, res: Response) => {
     const order = req.body;
     // Check is this user exist in our user collection
     if (!(await UserModel.isUserExists(Number(userId)))) {
-      return errorResponse(res, 400, 'User not found');
+      return errorResponse(res, 404, 'User not found');
     }
 
     //Check if the 'orders' property already exists for this user, append a new product to it orders
@@ -82,7 +82,7 @@ const retrieveAllOrders = async (req: Request, res: Response) => {
 
     // Check is this user exist in our user collection
     if (!(await UserModel.isUserExists(Number(userId)))) {
-      return errorResponse(res, 400, 'User not found');
+      return errorResponse(res, 4004, 'User not found');
     }
 
     const result = await orderServices.retrieveAllOrders(Number(userId));
@@ -112,7 +112,7 @@ const calculateTotalPriceOrder = async (req: Request, res: Response) => {
 
     // Check is this user exist in user collection
     if (!(await UserModel.isUserExists(Number(userId)))) {
-      return errorResponse(res, 400, 'User not found');
+      return errorResponse(res, 404, 'User not found');
     }
 
     const result = await orderServices.calculateTotalPriceOrder(Number(userId));
