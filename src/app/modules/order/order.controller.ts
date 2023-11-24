@@ -5,6 +5,22 @@ import { orderServices } from './order.service';
 import OrderModel from './order.model';
 import UserModel from '../user/user.model';
 
+// Send Error Response
+const errorResponse = (
+  res: Response,
+  statusCode: number,
+  errorMessage: string,
+) => {
+  res.status(statusCode).json({
+    success: false,
+    message: errorMessage,
+    error: {
+      code: 400,
+      description: errorMessage,
+    },
+  });
+};
+
 // Add orders
 const addOrders = async (req: Request, res: Response) => {
   try {
@@ -12,14 +28,7 @@ const addOrders = async (req: Request, res: Response) => {
     const order = req.body;
     // Check is this user exist in our user collection
     if (!(await UserModel.isUserExists(Number(userId)))) {
-      return res.status(400).json({
-        success: false,
-        message: 'User not found',
-        error: {
-          code: 404,
-          description: 'User not found!',
-        },
-      });
+      return errorResponse(res, 400, 'User not found');
     }
 
     //Check if the 'orders' property already exists for this user, append a new product to it orders
@@ -48,26 +57,20 @@ const addOrders = async (req: Request, res: Response) => {
   } catch (error: any) {
     // Handle Zod Errors
     if (error.name === 'ZodError') {
-      res.status(400).json({
-        status: 'fail',
-        message: error.issues
-          .map((error: any) => `${error.path.join('.')}: ${error.message}`)
-          .join(', '),
-      });
+      const errorMessage = error.issues
+        .map((error: any) => `${error.path.join('.')}: ${error.message}`)
+        .join(', ');
+
+      errorResponse(res, 400, errorMessage);
     }
     // Handle Mongoose error messages
     else if (error.name === 'CastError') {
-      res.status(400).json({
-        status: 'fail',
-        message: `Please provide a valid ${error.path}`,
-      });
+      const errorMessage = `Please provide a valid ${error.path}`;
+      errorResponse(res, 400, errorMessage);
     }
     // Handle other errors
     else {
-      res.status(400).json({
-        status: 'fail',
-        message: error.message || 'Something went wrong',
-      });
+      errorResponse(res, 400, error.message || 'Something went wrong');
     }
   }
 };
@@ -79,14 +82,7 @@ const retrieveAllOrders = async (req: Request, res: Response) => {
 
     // Check is this user exist in our user collection
     if (!(await UserModel.isUserExists(Number(userId)))) {
-      return res.status(400).json({
-        success: false,
-        message: 'User not found',
-        error: {
-          code: 404,
-          description: 'User not found!',
-        },
-      });
+      return errorResponse(res, 400, 'User not found');
     }
 
     const result = await orderServices.retrieveAllOrders(Number(userId));
@@ -100,17 +96,11 @@ const retrieveAllOrders = async (req: Request, res: Response) => {
   } catch (error: any) {
     // Handle mongoose Errors
     if (error.name === 'CastError') {
-      res.status(400).json({
-        status: 'fail',
-        message: `Please provide a valid ${error.path}`,
-      });
+      errorResponse(res, 400, `Please provide a valid ${error.path}`);
     }
     // Handle Others errors
     else {
-      res.status(400).json({
-        status: 'fail',
-        message: error.message || 'Something went wrong',
-      });
+      errorResponse(res, 400, error.message || 'Something went wrong');
     }
   }
 };
@@ -122,14 +112,7 @@ const calculateTotalPriceOrder = async (req: Request, res: Response) => {
 
     // Check is this user exist in user collection
     if (!(await UserModel.isUserExists(Number(userId)))) {
-      return res.status(400).json({
-        success: false,
-        message: 'User not found',
-        error: {
-          code: 404,
-          description: 'User not found!',
-        },
-      });
+      return errorResponse(res, 400, 'User not found');
     }
 
     const result = await orderServices.calculateTotalPriceOrder(Number(userId));
@@ -145,17 +128,11 @@ const calculateTotalPriceOrder = async (req: Request, res: Response) => {
   } catch (error: any) {
     // Handle Mongoose errors
     if (error.name === 'CastError') {
-      res.status(400).json({
-        status: 'fail',
-        message: `Please provide a valid ${error.path}`,
-      });
+      errorResponse(res, 400, `Please provide a valid ${error.path}`);
     }
     // Handle other errors
     else {
-      res.status(400).json({
-        status: 'fail',
-        message: error.message || 'Something went wrong',
-      });
+      errorResponse(res, 400, error.message || 'Something went wrong');
     }
   }
 };

@@ -4,6 +4,22 @@ import UserSchema from './user.validation';
 import { userServices } from './user.service';
 import UserModel from './user.model';
 
+// Send Error Response
+const errorResponse = (
+  res: Response,
+  statusCode: number,
+  errorMessage: string,
+) => {
+  res.status(statusCode).json({
+    success: false,
+    message: errorMessage,
+    error: {
+      code: 400,
+      description: errorMessage,
+    },
+  });
+};
+
 // Create user
 const createNewUser = async (req: Request, res: Response) => {
   try {
@@ -25,29 +41,23 @@ const createNewUser = async (req: Request, res: Response) => {
   } catch (error: any) {
     // Handle Zod error messages
     if (error.name === 'ZodError') {
-      res.status(400).json({
-        status: 'fail',
-        message: error.issues
-          .map((error: any) => `${error.path.join('.')}: ${error.message}`)
-          .join(', '),
-      });
+      const errorMessage = error.issues
+        .map((error: any) => `${error.path.join('.')}: ${error.message}`)
+        .join(', ');
+
+      errorResponse(res, 400, errorMessage);
     }
     // Handle Mongoose error messages
     else if (error.code === 11000) {
       const { keyValue } = error;
-      res.status(400).json({
-        status: 'fail',
-        message: `${Object.keys(keyValue)[0]}: ${
-          keyValue[Object.keys(keyValue)[0]]
-        } is already exist in database. Please provide a unique value`,
-      });
+      const errorMessage = `${Object.keys(keyValue)[0]}: ${
+        keyValue[Object.keys(keyValue)[0]]
+      } is already exist in database. Please provide a unique value`;
+      errorResponse(res, 400, errorMessage);
     }
     // Handle other error messages
     else {
-      res.status(400).json({
-        status: 'fail',
-        message: error || 'Something went wrong',
-      });
+      errorResponse(res, 400, error.message || 'Something Wend Wrong');
     }
   }
 };
@@ -64,10 +74,7 @@ const retrieveAllUsers = async (req: Request, res: Response) => {
       data: results,
     });
   } catch (error: any) {
-    res.status(400).json({
-      status: 'fail',
-      message: error.message || 'Something went wrong',
-    });
+    errorResponse(res, 400, error.message || 'Something went wrong');
   }
 };
 
@@ -77,14 +84,7 @@ const retrieveSpecificUserByID = async (req: Request, res: Response) => {
     const { userId } = req.params;
     // Check is user exists if not then send response
     if (!(await UserModel.isUserExists(Number(userId)))) {
-      return res.status(400).json({
-        success: false,
-        message: 'User not found',
-        error: {
-          code: 404,
-          description: 'User not found!',
-        },
-      });
+      return errorResponse(res, 400, 'User not found');
     }
 
     const result = await userServices.retrieveSpecificUserByID(Number(userId));
@@ -98,16 +98,12 @@ const retrieveSpecificUserByID = async (req: Request, res: Response) => {
   } catch (error: any) {
     // Handle Mongoose error messages
     if (error.name === 'CastError') {
-      res.status(400).json({
-        status: 'fail',
-        message: `Please provide a valid ${error.path}`,
-      });
-    } else {
-      // Handle other error messages
-      res.status(400).json({
-        status: 'fail',
-        message: error.message || 'Something went wrong',
-      });
+      const errorMessage = `Please provide a valid ${error.path}`;
+      errorResponse(res, 400, errorMessage);
+    }
+    // Handle other error messages
+    else {
+      errorResponse(res, 400, error.message || 'Something went wrong');
     }
   }
 };
@@ -120,14 +116,7 @@ const updateUserInformation = async (req: Request, res: Response) => {
 
     // Check is user exists if not then send response
     if (!(await UserModel.isUserExists(Number(userId)))) {
-      return res.status(400).json({
-        success: false,
-        message: 'User not found',
-        error: {
-          code: 404,
-          description: 'User not found!',
-        },
-      });
+      return errorResponse(res, 400, 'User not found');
     }
 
     const result = await userServices.updateUserInformation(
@@ -143,33 +132,22 @@ const updateUserInformation = async (req: Request, res: Response) => {
     });
   } catch (error: any) {
     if (error.name === 'CastError') {
-      res.status(400).json({
-        status: 'fail',
-        message: `Please provide a valid ${error.path}`,
-      });
+      const errorMessage = `Please provide a valid ${error.path}`;
+      errorResponse(res, 400, errorMessage);
     } else {
-      res.status(400).json({
-        status: 'fail',
-        message: error.message || 'Something went wrong',
-      });
+      errorResponse(res, 400, error.message || 'Something went wrong');
     }
   }
 };
 
+// Delete a user
 const deleteAUser = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
 
     // Check is user exists if not then send response
     if (!(await UserModel.isUserExists(Number(userId)))) {
-      return res.status(400).json({
-        success: false,
-        message: 'User not found',
-        error: {
-          code: 404,
-          description: 'User not found!',
-        },
-      });
+      return errorResponse(res, 400, 'User not found');
     }
 
     await userServices.deleteAUser(Number(userId));
@@ -183,16 +161,12 @@ const deleteAUser = async (req: Request, res: Response) => {
   } catch (error: any) {
     // Handle Mongoose error messages
     if (error.name === 'CastError') {
-      res.status(400).json({
-        status: 'fail',
-        message: `Please provide a valid ${error.path}`,
-      });
-    } else {
-      // Handle other error messages
-      res.status(400).json({
-        status: 'fail',
-        message: error.message || 'Something went wrong',
-      });
+      const errorMessage = `Please provide a valid ${error.path}`;
+      errorResponse(res, 400, errorMessage);
+    }
+    // Handle other error messages
+    else {
+      errorResponse(res, 400, error.message || 'Something went wrong');
     }
   }
 };
