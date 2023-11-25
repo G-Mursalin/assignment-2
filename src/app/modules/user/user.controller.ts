@@ -114,19 +114,6 @@ const updateUserInformation = async (req: Request, res: Response) => {
     const { userId } = req.params;
     const updatedDoc = req.body;
 
-    // Validation data with Zod
-    const pickFields = Object.keys(updatedDoc)
-      .filter((key) => typeof key === 'string')
-      .reduce(
-        (acc, key) => {
-          acc[key] = true;
-          return acc;
-        },
-        {} as { [key: string]: true },
-      );
-
-    const validateData = UserSchema.pick(pickFields).parse(updatedDoc);
-
     // Check is user exists if not then send response
     if (!(await UserModel.isUserExists(Number(userId)))) {
       return errorResponse(res, 404, 'User not found');
@@ -134,7 +121,7 @@ const updateUserInformation = async (req: Request, res: Response) => {
 
     const result = await userServices.updateUserInformation(
       Number(userId),
-      validateData,
+      updatedDoc,
     );
 
     // Send response

@@ -32,10 +32,14 @@ const updateUserInformation = async (
   id: number,
   updatedDoc: Partial<TUser>,
 ) => {
-  return await UserModel.findOneAndUpdate({ userId: id }, updatedDoc, {
-    new: true,
-    runValidators: true,
-  }).select({ _id: 0, password: 0, __v: 0 });
+  return await UserModel.findOneAndUpdate(
+    { userId: id },
+    { $set: updatedDoc },
+    {
+      new: true,
+      runValidators: true,
+    },
+  ).select({ _id: 0, password: 0, __v: 0 });
 };
 
 // Service for delete user

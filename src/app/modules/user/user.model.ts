@@ -14,6 +14,10 @@ const userSchema = new Schema<TUser, UserModelWithStaticMethod>({
     type: String,
     unique: true,
     trim: true,
+    validate: {
+      validator: (val: string) => val.trim().length >= 3,
+      message: 'User name should be minimum 3 characters long',
+    },
     required: [true, 'Please give us your user name'],
   },
   password: {
@@ -21,12 +25,25 @@ const userSchema = new Schema<TUser, UserModelWithStaticMethod>({
     required: [true, 'Please give us a password'],
   },
   fullName: {
-    firstName: { type: String },
-    lastName: { type: String },
+    firstName: {
+      type: String,
+      validate: {
+        validator: (val: string) => val.trim().length > 0,
+        message: 'Please provide a valid first name',
+      },
+    },
+    lastName: {
+      type: String,
+      validate: {
+        validator: (val: string) => val.trim().length > 0,
+        message: 'Please provide a valid last name',
+      },
+    },
   },
   age: {
     type: Number,
     required: [true, 'Please tell us your age'],
+    min: [1, 'Age can not be negative or zero'],
   },
   email: {
     type: String,
@@ -51,16 +68,28 @@ const userSchema = new Schema<TUser, UserModelWithStaticMethod>({
     street: {
       type: String,
       trim: true,
+      validate: {
+        validator: (val: string) => val.trim().length > 0,
+        message: 'Please tell us your valid street name',
+      },
       required: [true, 'Tell us your street name'],
     },
     city: {
       type: String,
       trim: true,
+      validate: {
+        validator: (val: string) => val.trim().length > 0,
+        message: 'Please tell us your valid city name',
+      },
       required: [true, 'Tell us your city name'],
     },
     country: {
       type: String,
       trim: true,
+      validate: {
+        validator: (val: string) => val.trim().length > 0,
+        message: 'Please tell us your valid country name',
+      },
       required: [true, 'Tell us your country name'],
     },
   },
