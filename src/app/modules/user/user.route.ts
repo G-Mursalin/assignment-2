@@ -1,14 +1,16 @@
 import express from 'express';
 import { userControllers } from './user.controller';
 import { orderControllers } from '../order/order.controller';
+import { isUserExists } from '../../middlewares/isUserExists';
 
 const router = express.Router();
 
 // Order Routes
-router.post('/:userId/orders', orderControllers.addOrders);
-router.get('/:userId/orders', orderControllers.retrieveAllOrders);
+router.post('/:userId/orders', isUserExists, orderControllers.addOrders);
+router.get('/:userId/orders', isUserExists, orderControllers.retrieveAllOrders);
 router.get(
   '/:userId/orders/total-price',
+  isUserExists,
   orderControllers.calculateTotalPriceOrder,
 );
 
@@ -16,8 +18,8 @@ router.get(
 router
   .post('/', userControllers.createNewUser)
   .get('/', userControllers.retrieveAllUsers)
-  .patch('/:userId', userControllers.updateUserInformation)
-  .get('/:userId', userControllers.retrieveSpecificUserByID)
-  .delete('/:userId', userControllers.deleteAUser);
+  .patch('/:userId', isUserExists, userControllers.updateUserInformation)
+  .get('/:userId', isUserExists, userControllers.retrieveSpecificUserByID)
+  .delete('/:userId', isUserExists, userControllers.deleteAUser);
 
 export const userRoutes = router;
