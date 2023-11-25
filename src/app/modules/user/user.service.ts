@@ -28,7 +28,10 @@ const retrieveSpecificUserByID = async (id: number) => {
 };
 
 // Service for update user information
-const updateUserInformation = async (id: number, updatedDoc: TUser) => {
+const updateUserInformation = async (
+  id: number,
+  updatedDoc: Partial<TUser>,
+) => {
   return await UserModel.findOneAndUpdate({ userId: id }, updatedDoc, {
     new: true,
     runValidators: true,

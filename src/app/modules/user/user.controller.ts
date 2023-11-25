@@ -125,7 +125,7 @@ const updateUserInformation = async (req: Request, res: Response) => {
         {} as { [key: string]: true },
       );
 
-    UserSchema.pick(pickFields).parse(updatedDoc);
+    const validateData = UserSchema.pick(pickFields).parse(updatedDoc);
 
     // Check is user exists if not then send response
     if (!(await UserModel.isUserExists(Number(userId)))) {
@@ -134,7 +134,7 @@ const updateUserInformation = async (req: Request, res: Response) => {
 
     const result = await userServices.updateUserInformation(
       Number(userId),
-      updatedDoc,
+      validateData,
     );
 
     // Send response
