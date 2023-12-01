@@ -1,8 +1,10 @@
 import { z } from 'zod';
-import UserSchema from './user.validation';
+import { studentValidators } from './user.validation';
 import { Model } from 'mongoose';
 
-export type TUser = z.infer<typeof UserSchema>;
+export type TUser = z.infer<
+  typeof studentValidators.createUserValidationSchema
+>;
 
 export interface UserModelWithStaticMethod extends Model<TUser> {
   // eslint-disable-next-line no-unused-vars

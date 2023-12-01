@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Request, Response } from 'express';
-import UserSchema from './user.validation';
 import { userServices } from './user.service';
 import catchAsync from '../../utils/catchAsync';
 
@@ -8,11 +7,8 @@ import catchAsync from '../../utils/catchAsync';
 const createNewUser = catchAsync(async (req: Request, res: Response) => {
   const user = req.body;
 
-  // Validation data with Zod
-  const validateData = UserSchema.parse(user);
-
   // Save the validate user data to database and fetch fresh that user data
-  const result = await userServices.createNewUser(validateData);
+  const result = await userServices.createNewUser(user);
   const userData = await userServices.retrieveSpecificUserByID(result.userId);
 
   // Send response

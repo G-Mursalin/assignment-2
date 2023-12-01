@@ -32,14 +32,25 @@ const updateUserInformation = async (
   id: number,
   updatedDoc: Partial<TUser>,
 ) => {
-  return await UserModel.findOneAndUpdate(
-    { userId: id },
-    { $set: updatedDoc },
-    {
-      new: true,
-      runValidators: true,
-    },
-  ).select({ _id: 0, password: 0, __v: 0 });
+  const { fullName, address, ...others } = updatedDoc;
+
+  const modifiedUpdatedData: Record<string, unknown> = { ...others };
+
+  if (fullName && Object.keys(fullName).length) {
+    for (const [key, value] of Object.entries(fullName)) {
+      modifiedUpdatedData[`fullName.${key}`] = value;
+    }
+  }
+
+  if (address && Object.keys(address).length) {
+    for (const [key, value] of Object.entries(address)) {
+      modifiedUpdatedData[`address.${key}`] = value;
+    }
+  }
+  return await UserModel.findOneAndUpdate({ userId: id }, modifiedUpdatedData, {
+    new: true,
+    runValidators: true,
+  }).select({ _id: 0, password: 0, __v: 0 });
 };
 
 // Service for delete user

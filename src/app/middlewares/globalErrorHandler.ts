@@ -47,7 +47,11 @@ const globalErrorHandler = (
   }
   // Handle other error messages
   else {
-    errorResponse(res, 400, error.message || 'Something Wend Wrong');
+    errorResponse(
+      res,
+      error.statusCode || 500,
+      error.message || 'Something Wend Wrong',
+    );
   }
 
   next();

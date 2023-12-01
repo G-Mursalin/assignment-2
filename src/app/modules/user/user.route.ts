@@ -2,6 +2,8 @@ import express from 'express';
 import { userControllers } from './user.controller';
 import { orderControllers } from '../order/order.controller';
 import { isUserExists } from '../../middlewares/isUserExists';
+import validateRequest from '../../middlewares/validateRequest';
+import { userValidators } from './user.validation';
 
 const router = express.Router();
 
@@ -16,9 +18,18 @@ router.get(
 
 // Users Routes
 router
-  .post('/', userControllers.createNewUser)
+  .post(
+    '/',
+    validateRequest(userValidators.createUserValidationSchema),
+    userControllers.createNewUser,
+  )
   .get('/', userControllers.retrieveAllUsers)
-  .put('/:userId', isUserExists, userControllers.updateUserInformation)
+  .put(
+    '/:userId',
+    isUserExists,
+    validateRequest(userValidators.updateUserValidationSchema),
+    userControllers.updateUserInformation,
+  )
   .get('/:userId', isUserExists, userControllers.retrieveSpecificUserByID)
   .delete('/:userId', isUserExists, userControllers.deleteAUser);
 
