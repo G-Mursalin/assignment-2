@@ -1,23 +1,29 @@
 import { z } from 'zod';
 
-export const Order = z.object({
+const createOrderValidationSchema = z.object({
   productName: z
-    .string()
+    .string({
+      required_error: 'Product name is required',
+      invalid_type_error: 'Product name must be a string',
+    })
     .trim()
     .refine((val) => val.trim().length > 0, {
       message: 'Please provide a  valid product name',
     }),
   price: z
-    .number()
+    .number({
+      required_error: 'Price is required',
+      invalid_type_error: 'Price must be a number',
+    })
     .positive({ message: 'Price can not be negative number or zero' }),
-  quantity: z.number().refine((val) => val > 0, {
-    message: 'Quantity should be minimum 1',
-  }),
+  quantity: z
+    .number({
+      required_error: 'Quantity is required',
+      invalid_type_error: 'Quantity must be a number',
+    })
+    .refine((val) => val > 0, {
+      message: 'Quantity should be minimum 1',
+    }),
 });
 
-const OrderSchema = z.object({
-  userId: z.number(),
-  orders: z.array(Order),
-});
-
-export default OrderSchema;
+export const orderValidations = { createOrderValidationSchema };

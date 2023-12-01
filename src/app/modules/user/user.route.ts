@@ -4,11 +4,17 @@ import { orderControllers } from '../order/order.controller';
 import { isUserExists } from '../../middlewares/isUserExists';
 import validateRequest from '../../middlewares/validateRequest';
 import { userValidators } from './user.validation';
+import { orderValidations } from '../order/order.validation';
 
 const router = express.Router();
 
 // Order Routes
-router.put('/:userId/orders', isUserExists, orderControllers.addOrders);
+router.put(
+  '/:userId/orders',
+  isUserExists,
+  validateRequest(orderValidations.createOrderValidationSchema),
+  orderControllers.addOrders,
+);
 router.get('/:userId/orders', isUserExists, orderControllers.retrieveAllOrders);
 router.get(
   '/:userId/orders/total-price',

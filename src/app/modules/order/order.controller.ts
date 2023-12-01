@@ -1,8 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Request, Response } from 'express';
-import OrderSchema, { Order } from './order.validation';
 import { orderServices } from './order.service';
-import OrderModel from './order.model';
 import catchAsync from '../../utils/catchAsync';
 
 // Add orders
@@ -10,25 +8,7 @@ const addOrders = catchAsync(async (req: Request, res: Response) => {
   const { userId } = req.params;
   const order = req.body;
 
-  //Check if the 'orders' property already exists for this user, append a new product to it orders
-  const existsOrder = await OrderModel.isThisUserOrderExists(Number(userId));
-  if (existsOrder && existsOrder.orders.length >= 1) {
-    // Validation data with Zod
-    const validateData = Order.parse(order);
-    await OrderModel.updateOne(
-      { userId: userId },
-      { $addToSet: { orders: validateData } },
-    );
-  } else {
-    // Validation data with Zod
-    const validateData = OrderSchema.parse({
-      userId: Number(userId),
-      orders: [order],
-    });
-
-    await orderServices.addOrders(validateData);
-  }
-
+  await orderServices.addOrders(userId, order);
   // Send response
   res.status(201).json({
     success: true,
