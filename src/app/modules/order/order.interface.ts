@@ -1,9 +1,14 @@
 import { z } from 'zod';
-import OrderSchema, { Order } from './order.validation';
 import { Model } from 'mongoose';
+import { orderValidations } from './order.validation';
 
-export type TOrders = z.infer<typeof OrderSchema>;
-export type TOrder = z.infer<typeof Order>;
+export type TOrder = z.infer<
+  typeof orderValidations.createOrderValidationSchema
+>;
+export type TOrders = {
+  userId: number;
+  orders: [TOrder];
+};
 
 export interface OrderModelWithStaticMethod extends Model<TOrders> {
   // eslint-disable-next-line no-unused-vars

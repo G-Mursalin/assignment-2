@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Request, Response } from 'express';
 import { orderServices } from './order.service';
 import catchAsync from '../../utils/catchAsync';
